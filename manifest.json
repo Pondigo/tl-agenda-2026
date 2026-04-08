@@ -1,0 +1,16 @@
+{
+  "name": "TL 2026 — Mié 8",
+  "short_name": "TL Mié 8",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#111111",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23111'/><text x='50' y='58' text-anchor='middle' font-size='40' font-family='system-ui' font-weight='900' fill='white'>TL</text></svg>",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.json">
+<title>TL 2026 — Mié 8</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+
+/* CSS VARIABLES — LIGHT */
+:root{--bg:#fff;--bg2:#f5f5f5;--fg:#111;--fg2:#555;--fg3:#888;--fg4:#bbb;--fg5:#ccc;--border:#e0e0e0;--border2:#f0f0f0;--card-rec:#fafafa;--fb-bg:#fff;--dot-off:#ccc;--tag-bg:#111;--tag-fg:#fff}
+
+/* DARK THEME */
+[data-theme="dark"]{--bg:#111;--bg2:#1a1a1a;--fg:#eee;--fg2:#aaa;--fg3:#777;--fg4:#555;--fg5:#333;--border:#282828;--border2:#1e1e1e;--card-rec:#1a1a1a;--fb-bg:#111;--dot-off:#444;--tag-bg:#eee;--tag-fg:#111}
+
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--fg);padding:0 0 72px;-webkit-text-size-adjust:100%;transition:background .2s,color .2s}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 16px 6px}
+.hdr-top{display:flex;justify-content:space-between;align-items:center}
+.hdr h1{font-size:17px;font-weight:800;letter-spacing:-.3px}
+.hdr .sub{font-size:10px;color:var(--fg3);margin-top:1px;letter-spacing:.2px}
+
+/* THEME TOGGLE */
+.tt{width:32px;height:18px;border-radius:9px;border:1.5px solid var(--fg4);background:var(--bg2);cursor:pointer;position:relative;flex-shrink:0;transition:all .2s}
+.tt::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--fg);transition:transform .2s}
+[data-theme="dark"] .tt::after{transform:translateX(14px)}
+
+/* SHARE BTN */
+.sh-btn{width:32px;height:32px;border:none;background:none;cursor:pointer;color:var(--fg3);font-size:16px;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;transition:color .2s}
+.sh-btn:active{color:var(--fg);background:var(--bg2)}
+.hdr-right{display:flex;align-items:center;gap:6px}
+
+/* SEARCH */
+.srch{margin:8px 0 4px;position:relative}
+.srch input{width:100%;padding:9px 12px 9px 32px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--fg);font-size:14px;outline:none}
+.srch input:focus{border-color:var(--fg)}
+.srch::before{content:'';position:absolute;left:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;border:2px solid var(--fg3);border-radius:50%}
+.srch::after{content:'';position:absolute;left:23px;top:60%;width:2px;height:6px;background:var(--fg3);transform:rotate(-45deg)}
+
+/* FILTERS */
+.flt{display:flex;gap:5px;overflow-x:auto;padding:5px 0;scrollbar-width:none}
+.flt::-webkit-scrollbar{display:none}
+.fb{flex-shrink:0;padding:4px 10px;background:var(--fb-bg);border:1px solid var(--border);border-radius:16px;color:var(--fg3);font-size:10px;cursor:pointer;white-space:nowrap;font-weight:500}
+.fb.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+
+/* TIME */
+.tl{position:sticky;top:68px;z-index:50;background:var(--bg);padding:14px 16px 4px;font-size:28px;font-weight:900;color:var(--fg);letter-spacing:-1px;border-bottom:1px solid var(--border2)}
+
+/* CARDS */
+.c{border-bottom:1px solid var(--border2);padding:12px 16px;position:relative}
+.c.rec{background:var(--card-rec);border-left:2px solid var(--fg)}
+.c.kn{background:var(--card-rec);border-left:2px solid var(--fg)}
+
+/* LIVE DOT */
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--dot-off);margin-right:6px;vertical-align:middle;flex-shrink:0}
+.dot.live{background:#e00;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+.c-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.c-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--fg3)}
+.c-type.kn{color:var(--fg)}
+.c-land{font-size:9px;color:var(--fg4);font-weight:500}
+
+.c-title{font-size:15px;font-weight:600;line-height:1.35;margin-bottom:4px;color:var(--fg)}
+
+.c-meta{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--fg3);align-items:center}
+.c-speaker{font-size:12px;color:var(--fg2);font-weight:500;margin-top:3px}
+.c-bio{font-size:11px;color:var(--fg3);line-height:1.4;margin-top:4px}
+
+.tag{display:inline-block;font-size:9px;font-weight:700;background:var(--tag-bg);color:var(--tag-fg);padding:1px 6px;border-radius:3px;margin-bottom:4px;letter-spacing:.3px}
+
+/* BOTTOM NAV */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--bg);border-top:1px solid var(--border);display:flex;z-index:100;padding:4px 0 env(safe-area-inset-bottom,4px)}
+.nb{flex:1;text-align:center;padding:6px 4px;color:var(--fg4);font-size:9px;cursor:pointer;border:none;background:none;font-weight:600}
+.nb.on{color:var(--fg)}
+.nb i{display:block;font-size:16px;font-style:normal;margin-bottom:1px}
+
+.empty{text-align:center;padding:60px 20px;color:var(--fg5);font-size:13px}
+
+/* MAP VIEW */
+#mapView{display:none;padding:12px 10px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+#mapView.show{display:block}
+#mapView svg{display:block;margin:0 auto;max-width:100%;height:auto}
+.mz{stroke-width:1.5;fill-opacity:.08;rx:6;ry:6;cursor:pointer}
+.mz:active{fill-opacity:.22}
+.ml{font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-weight:700;fill:var(--fg);pointer-events:none}
+.ml-sm{font-size:7.5px;fill:var(--fg3)}
+.ml-icon{font-size:11px}
+.map-bg{fill:var(--bg2);rx:12;ry:12}
+.map-road{stroke:var(--border);stroke-width:1;stroke-dasharray:4,3;fill:none}
+.map-title{font-family:-apple-system,BlinkMacSystemFont,sans-serif;font-size:10px;fill:var(--fg3);font-weight:600;text-anchor:middle;letter-spacing:.5px}
+.map-label-wc{font-size:8px;fill:var(--fg4);font-family:-apple-system,sans-serif}
+.map-entry{font-size:9px;fill:var(--fg3);font-weight:700;text-anchor:middle;letter-spacing:1px;font-family:-apple-system,sans-serif}
+
+/* Fav circle */
+.fv{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--border);transition:all .15s}
+.fv.on{border-color:var(--fg);background:var(--fg);color:var(--bg)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top"><h1>Talent Land 2026</h1><div class="hdr-right"><button class="sh-btn" id="shareBtn" onclick="shareFile()" title="Compartir">&#x1F4E4;</button><div class="tt" id="tt" onclick="toggleTheme()"></div></div></div>
+  <div class="sub">MIE 8 ABR · EXPO SANTA FE · OFFLINE · Unofficial by <a href="https://instagram.com/pondinora" style="color:var(--fg3);text-decoration:none;border-bottom:1px solid var(--fg4)">@pondinora</a></div>
+  <div class="srch"><input type="text" id="si" placeholder="Buscar sesión, ponente..."></div>
+  <div class="flt" id="flt">
+    <button class="fb on" data-f="all">TODO</button>
+    <button class="fb" data-f="Main Stage">MAIN</button>
+    <button class="fb" data-f="Developer">DEV</button>
+    <button class="fb" data-f="Future">FUTURE</button>
+    <button class="fb" data-f="Business">BIZ</button>
+    <button class="fb" data-f="Creator">CREATOR</button>
+    <button class="fb" data-f="Health">HEALTH</button>
+    <button class="fb" data-f="Investor">INVESTOR</button>
+    <button class="fb" data-f="Workshop">WORKSHOP</button>
+    <button class="fb" data-f="Google Cloud">GCLOUD</button>
+  </div>
+</div>
+
+<div id="ag"></div>
+
+<div id="mapView">
+<svg viewBox="0 0 700 450" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect class="map-bg" x="5" y="5" width="690" height="440"/>
+  <!-- Grid roads -->
+  <path class="map-road" d="M5 120 H695"/>
+  <path class="map-road" d="M5 200 H695"/>
+  <path class="map-road" d="M5 280 H695"/>
+  <path class="map-road" d="M5 370 H695"/>
+  <path class="map-road" d="M250 5 V445"/>
+  <path class="map-road" d="M405 5 V445"/>
+  <path class="map-road" d="M540 5 V445"/>
+  <!-- Title -->
+  <text class="map-title" x="350" y="448">EXPO SANTA FE CDMX · TALENT LAND 2026</text>
+  <!-- Entrada / Salida -->
+  <text class="map-entry" x="375" y="430">ENTRADA ▲</text>
+  <text class="map-entry" x="225" y="430">SALIDA ▼</text>
+  <!-- WC -->
+  <text class="map-label-wc" x="25" y="148">🚻 WC</text>
+  <text class="map-label-wc" x="25" y="358">🚻 WC</text>
+
+  <!-- ZONES -->
+  <!-- Main Stage -->
+  <rect class="mz" x="80" y="20" width="220" height="95" stroke="#22c55e" fill="#22c55e"/>
+  <text class="ml" x="190" y="58" text-anchor="middle" font-size="12">🎤 Main Stage</text>
+  <text class="ml-sm" x="190" y="74" text-anchor="middle">Keynotes & Inauguración</text>
+
+  <!-- Zona de Comidas -->
+  <rect class="mz" x="490" y="20" width="160" height="65" stroke="#a3a3a3" fill="#a3a3a3"/>
+  <text class="ml" x="570" y="50" text-anchor="middle" font-size="10">🍽️ Zona de Comidas</text>
+  <text class="ml-sm" x="570" y="64" text-anchor="middle">Food Court</text>
+
+  <!-- Developer Land -->
+  <rect class="mz" x="80" y="130" width="165" height="65" stroke="#cd61ff" fill="#cd61ff"/>
+  <text class="ml" x="162" y="158" text-anchor="middle" font-size="11">💻 Developer Land</text>
+  <text class="ml-sm" x="162" y="174" text-anchor="middle">Dev Stage · Google Cloud</text>
+
+  <!-- Gamer Zone -->
+  <rect class="mz" x="260" y="130" width="140" height="65" stroke="#f97316" fill="#f97316"/>
+  <text class="ml" x="330" y="158" text-anchor="middle" font-size="11">🎮 Gamer Zone</text>
+  <text class="ml-sm" x="330" y="174" text-anchor="middle">Esports & Gaming</text>
+
+  <!-- Creator Land -->
+  <rect class="mz" x="490" y="100" width="160" height="65" stroke="#f7963b" fill="#f7963b"/>
+  <text class="ml" x="570" y="128" text-anchor="middle" font-size="11">🎨 Creator Land</text>
+  <text class="ml-sm" x="570" y="144" text-anchor="middle">Creator Stage</text>
+
+  <!-- Genius Arena -->
+  <rect class="mz" x="15" y="215" width="85" height="100" stroke="#ec4899" fill="#ec4899"/>
+  <text class="ml" x="57" y="258" text-anchor="middle" font-size="9">🧠 Genius</text>
+  <text class="ml" x="57" y="272" text-anchor="middle" font-size="9">Arena</text>
+  <text class="ml-sm" x="57" y="286" text-anchor="middle">Hackatones</text>
+
+  <!-- Foro Central -->
+  <rect class="mz" x="260" y="210" width="140" height="55" stroke="#10b981" fill="#10b981"/>
+  <text class="ml" x="330" y="235" text-anchor="middle" font-size="11">🏛️ Foro Central</text>
+  <text class="ml-sm" x="330" y="249" text-anchor="middle">Panels</text>
+
+  <!-- Health Land -->
+  <rect class="mz" x="540" y="180" width="110" height="75" stroke="#ef4444" fill="#ef4444"/>
+  <text class="ml" x="595" y="212" text-anchor="middle" font-size="10">❤️ Health Land</text>
+  <text class="ml-sm" x="595" y="228" text-anchor="middle">Health Stage</text>
+
+  <!-- Future Land -->
+  <rect class="mz" x="410" y="210" width="120" height="55" stroke="#06b6d4" fill="#06b6d4"/>
+  <text class="ml" x="470" y="235" text-anchor="middle" font-size="10">🚀 Future Land</text>
+  <text class="ml-sm" x="470" y="249" text-anchor="middle">Future Stage</text>
+
+  <!-- Business Land -->
+  <rect class="mz" x="140" y="290" width="140" height="65" stroke="#616bff" fill="#616bff"/>
+  <text class="ml" x="210" y="318" text-anchor="middle" font-size="10">💼 Business Land</text>
+  <text class="ml-sm" x="210" y="334" text-anchor="middle">Business Stage</text>
+
+  <!-- Investor Land -->
+  <rect class="mz" x="295" y="290" width="120" height="65" stroke="#f59e0b" fill="#f59e0b"/>
+  <text class="ml" x="355" y="318" text-anchor="middle" font-size="10">📈 Investor Land</text>
+  <text class="ml-sm" x="355" y="334" text-anchor="middle">Investor Stage</text>
+
+  <!-- Workshops -->
+  <rect class="mz" x="430" y="290" width="120" height="65" stroke="#8b5cf6" fill="#8b5cf6"/>
+  <text class="ml" x="490" y="318" text-anchor="middle" font-size="10">🛠️ Workshops</text>
+  <text class="ml-sm" x="490" y="334" text-anchor="middle">W1 · W2 · W3 · W4</text>
+
+  <!-- Zona Comunidades -->
+  <rect class="mz" x="560" y="290" width="100" height="65" stroke="#64748b" fill="#64748b"/>
+  <text class="ml" x="610" y="315" text-anchor="middle" font-size="9">👥 Zona</text>
+  <text class="ml" x="610" y="329" text-anchor="middle" font-size="9">Comunidades</text>
+
+  <!-- Google Cloud Zone -->
+  <rect class="mz" x="115" y="210" width="130" height="55" stroke="#4285f4" fill="#4285f4"/>
+  <text class="ml" x="180" y="235" text-anchor="middle" font-size="10">☁️ Google Cloud</text>
+  <text class="ml-sm" x="180" y="249" text-anchor="middle">Zona GCloud</text>
+
+  <!-- Stands / Expo zone -->
+  <rect class="mz" x="140" y="375" width="420" height="40" stroke="#a3a3a3" fill="#a3a3a3"/>
+  <text class="ml" x="350" y="400" text-anchor="middle" font-size="10">🏪 Stands & Expo · Patrocinadores</text>
+</svg>
+</div>
+
+<div class="bnav">
+  <button class="nb on" data-v="all"><i>&#9776;</i>Agenda</button>
+  <button class="nb" data-v="rec"><i>&#9733;</i>Picks</button>
+  <button class="nb" data-v="fav"><i>&#9679;</i>Guardados</button>
+  <button class="nb" data-v="map"><i>&#9632;</i>Mapa</button>
+  <button class="nb" id="nowBtn"><i>&#8595;</i>Ahora</button>
+</div>
+
+<script>
+const S=[
+{t:"09:30",e:"10:55",n:"Inauguración",y:"Conferencia",s:"Main Stage",l:"",p:"",r:0,b:""},
+{t:"10:00",e:"11:00",n:"En un mundo que no fue hecho para nosotras, es momento de construir como queremos habitarlo",y:"Taller",s:"Zona Comunidades",l:"",p:"Technolatinas",r:0,b:""},
+{t:"11:00",e:"11:55",n:"Misión: Interstellar",y:"Keynote",s:"Main Stage",l:"Future Land",p:"Javier Santaolalla",r:1,b:"Físico, PhD CERN, millones de seguidores en YouTube. Ciencia real."},
+{t:"11:00",e:"11:25",n:"De $10 USD a Inversionista Global",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Gonzalo Acuna Nava",r:0,b:""},
+{t:"11:00",e:"11:30",n:"El Futuro Conectado: Convergencia Legal y Tecnológica",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Juan Antonio Ramírez",r:0,b:""},
+{t:"11:00",e:"11:30",n:"Educación en salud personalizada con IA y enfoque humano",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"Daniel A. Madrigal Ramirez",r:0,b:""},
+{t:"11:00",e:"11:30",n:"De cero a startup con impacto",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Ulises Uribe de la Paz Pérez",r:0,b:""},
+{t:"11:00",e:"11:30",n:"Como hacer que la IA haga tu chamba por ti (más o menos)",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Arelis Alejandra Reyes Guerra",r:1,b:"AI PRÁCTICA — El título honesto ya dice mucho. Developer Stage."},
+{t:"11:00",e:"11:30",n:"Cómo usar la IA para vender más con tus anuncios",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"LUIS FLORES",r:0,b:""},
+{t:"11:00",e:"11:55",n:"Tips de Película para Brillar en tu Próxima Entrevista",y:"Taller",s:"Workshop 3",l:"",p:"Mariana Jasso",r:0,b:""},
+{t:"11:00",e:"12:00",n:"Future Driven: Inteligencia Artificial en Acción",y:"Taller",s:"Workshop 2",l:"Future Land",p:"JD Sttark",r:0,b:""},
+{t:"11:00",e:"12:00",n:"Programación Creativa Maker-STEAM con Microbit",y:"Taller",s:"Zona Comunidades",l:"",p:"Red LaTE México",r:0,b:""},
+{t:"11:00",e:"12:00",n:"Un Mundo Propio: De La Experiencia Al Universo Creativo",y:"Taller",s:"Workshop 1",l:"Creator Land",p:"Juan Pablo Zola",r:0,b:""},
+{t:"11:00",e:"12:30",n:"Construyendo con Google Antigravity",y:"Taller",s:"Zona Google Cloud",l:"Developer Land",p:"Camilla Martins, Juan G. Gomez, Lesly Zerna",r:0,b:""},
+{t:"11:00",e:"13:00",n:"Primeros Auxilios en Trauma y Control de Lesiones",y:"Taller",s:"Workshop 4",l:"Health Land",p:"",r:0,b:""},
+{t:"11:30",e:"11:55",n:"La Originalidad de una Idea",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"IZack",r:0,b:""},
+{t:"11:30",e:"11:55",n:"RedEAmérica: inversión social privada",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Karla Jiménez",r:0,b:""},
+{t:"11:30",e:"12:00",n:"Algoritmos de odio: el futuro de las redes",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Ana Karen Ramirez",r:0,b:""},
+{t:"11:30",e:"12:00",n:"Heridas de la Infancia, sus máscaras y como sanar",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"Blanca Ireri Espinosa",r:0,b:""},
+{t:"11:30",e:"12:00",n:"Oportunidades Tech en Austria: carreras que Europa necesita",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Alejandro Nájera",r:0,b:""},
+{t:"11:30",e:"12:00",n:"Liderar equipos en remoto con IA sin perder lo humano",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Irene Toledano Campos",r:0,b:""},
+{t:"12:00",e:"12:55",n:"Una charla con Uri Sabat",y:"Keynote",s:"Main Stage",l:"Creator Land",p:"Uri Sabat",r:0,b:"Creador de contenido español. Keynote Creator Land."},
+{t:"12:00",e:"12:25",n:"El rol de los ecosistemas en el levantamiento de capital",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Eduardo A. Florez Galeano",r:0,b:""},
+{t:"12:00",e:"12:30",n:"De Industria Creativa a Economía Creativa",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Bty Martínez",r:0,b:""},
+{t:"12:00",e:"12:30",n:"MENTE IMPARABLE",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Juan Carlos Rico",r:0,b:""},
+{t:"12:00",e:"12:30",n:"Emprender en la economía de la longevidad",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"Gabo Charles",r:0,b:""},
+{t:"12:00",e:"12:30",n:"Imaginación Social y Ruralidad",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Act. Clemente Cabello",r:0,b:""},
+{t:"12:00",e:"12:30",n:"Inteligencia artificial y el cambio climático",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Aldo Díaz",r:0,b:""},
+{t:"12:00",e:"13:00",n:"De idea a negocio en 30 minutos",y:"Taller",s:"Workshop 2",l:"Business Land",p:"Claudia Donají Jiménez",r:0,b:""},
+{t:"12:00",e:"13:00",n:"Laboratorio DUXIT: Hackea tu Snack",y:"Taller",s:"Zona Comunidades",l:"",p:"Global Shapers",r:0,b:""},
+{t:"12:00",e:"13:00",n:"Diseño de futuros como ventaja competitiva",y:"Taller",s:"Workshop 1",l:"Business Land",p:"Glenda Michel",r:0,b:""},
+{t:"12:00",e:"13:00",n:"El valor de tu vida solo tu lo defines",y:"Taller",s:"Workshop 3",l:"Health Land",p:"Rous Ruíz",r:0,b:""},
+{t:"12:30",e:"12:55",n:"El Rol del Talento Humano en la Revolución de la IA",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Damián Malfatti",r:0,b:""},
+{t:"12:30",e:"13:00",n:"Crear o destruir: el arte como herramienta de vida",y:"Panel",s:"Health Stage",l:"Health Land",p:"Esdena y Ericka Bañuelos",r:0,b:""},
+{t:"12:30",e:"13:00",n:"Automatiza tus DMs: Chatbots para Instagram y TikTok",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Achaiah Macías",r:0,b:""},
+{t:"12:30",e:"13:00",n:"El poder de tu Avatar está en reconocer tu talento",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Marisela Corres Santana",r:0,b:""},
+{t:"12:30",e:"13:00",n:"Blockchain más allá de las Criptomonedas",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Daniel Mendieta",r:1,b:"BLOCKCHAIN/DeFi — CEO Conecta, 18 años fintech y criptografía. Pagos instantáneos, plataformas financieras. Doctorante."},
+{t:"12:30",e:"13:25",n:"Panel de inversión en crowdfunding regulado",y:"Panel",s:"Investor Stage",l:"Investor Land",p:"Humberto Ramonet, Fernando Tapia, Alexis Sánchez",r:0,b:""},
+{t:"12:30",e:"13:30",n:"Desplegar agentes ADK en Agent Engine",y:"Taller",s:"Zona Google Cloud",l:"Developer Land",p:"Gerardo Falcon, Lesly Zerna, Camilla Martins",r:1,b:"AGENTIC — Taller hands-on Google Cloud. ADK (Agent Development Kit) desplegando en Agent Engine."},
+{t:"13:00",e:"13:25",n:"Sin pilas, sin cables: el futuro de la energía cinética",y:"Conferencia",s:"Main Stage",l:"Future Land",p:"Elizabeth Villaruel Rosales (Ellie)",r:0,b:""},
+{t:"13:00",e:"13:30",n:"Energía que Evoluciona: Autos del Futuro",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Jorge Vázquez Murillo",r:0,b:""},
+{t:"13:00",e:"13:30",n:"Dispositivos médicos inteligentes",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"Gustavo Moreno",r:0,b:""},
+{t:"13:00",e:"13:30",n:"Tecnología financiera a escala",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Alejandro Kimura",r:1,b:"TRADFI — Dir. Sistemas Grupo Elektra, 20+ años. MBA UT Austin. Plataformas fintech a escala masiva."},
+{t:"13:00",e:"13:30",n:"Proyectos que Hacen Destacar a Cualquier Developer",y:"Panel",s:"Developer Stage",l:"Developer Land",p:"Hazel Sáenz, Axel Espinosa",r:1,b:"DEV CAREER — Panel práctico: qué proyectos te diferencian como dev."},
+{t:"13:00",e:"14:00",n:"Del negativo al BookTok",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Mayra González Olvera",r:0,b:""},
+{t:"13:00",e:"14:00",n:"Arquitectura Comercial: 5 pasos",y:"Taller",s:"Workshop 3",l:"Business Land",p:"Rosendo López",r:0,b:""},
+{t:"13:00",e:"14:00",n:"Sexo y Punto",y:"Taller",s:"Workshop 2",l:"Health Land",p:"Sex. Oscar Yañez M",r:0,b:""},
+{t:"13:00",e:"14:00",n:"El momento ideal para reinvertir en mi negocio",y:"Taller",s:"Workshop 1",l:"Business Land",p:"Mtro. Erick H. Macias",r:0,b:""},
+{t:"13:00",e:"14:00",n:"BIG DATA y datos geo-referenciados en México",y:"Taller",s:"Workshop 4",l:"Developer Land",p:"Maestro Pedro Vallejo",r:0,b:""},
+{t:"13:00",e:"14:30",n:"Toma de Fotografía: Líderes Comunidades",y:"Taller",s:"Zona Comunidades",l:"",p:"",r:0,b:""},
+{t:"13:30",e:"14:25",n:"Resiliencia financiera: ¿Qué hacer cuando quieres renunciar a ser adulto?",y:"Keynote",s:"Main Stage",l:"Investor Land",p:"Sofia Macias",r:1,b:"Autora 'Pequeño Cerdo Capitalista'. Finanzas personales con datos, sin rollo."},
+{t:"13:30",e:"13:55",n:"¿Consigo Clientes o Levanto Capital?",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Alonso Santiago",r:0,b:""},
+{t:"13:30",e:"14:00",n:"Hackeando el Futuro",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Lucy Del Pozo",r:0,b:""},
+{t:"13:30",e:"14:00",n:"Health-Tech Matrix",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"Tatiana Fiordelisio",r:0,b:""},
+{t:"13:30",e:"14:00",n:"No construyas prompts. Construye sistemas con IA",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"David Fernández Caballero",r:1,b:"AI SYSTEMS — CEO TDM Internacional. IA aplicada, pensamiento de sistemas. Más allá de prompt engineering."},
+{t:"13:30",e:"14:00",n:"Tech career with global impact: why Estonia",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Karin Kase",r:0,b:""},
+{t:"14:00",e:"14:30",n:"IA vs. Creatividad Artesanal",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Vieri Figallo",r:0,b:""},
+{t:"14:00",e:"14:30",n:"Invertir en Deep Tech",y:"Conferencia",s:"Investor Stage",l:"",p:"Gabo Charles",r:0,b:""},
+{t:"14:00",e:"14:30",n:"Movilidad profesional, el arte de viajar e impulsar la ciencia",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"Dr. Uri Cruz",r:0,b:""},
+{t:"14:00",e:"14:30",n:"UX comienza contigo",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Yael Alvizuri",r:0,b:""},
+{t:"14:00",e:"14:30",n:"Sostenibilidad real",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Erika Ramírez Dávalos",r:0,b:""},
+{t:"14:00",e:"14:30",n:"Del crédito al crecimiento",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Daniel Astorga",r:0,b:""},
+{t:"14:00",e:"15:00",n:"Q&A Trading e Inversión con Quantfury",y:"Taller",s:"Workshop 2",l:"Investor Land",p:"David Ahumada",r:0,b:""},
+{t:"14:00",e:"15:00",n:"El trabajo en equipo",y:"Taller",s:"Workshop 4",l:"Business Land",p:"Alejandro García Vera",r:0,b:""},
+{t:"14:00",e:"15:00",n:"Decision-First Ideation: Design Thinking con IA",y:"Taller",s:"Workshop 1",l:"Business Land",p:"Heri Mendoza",r:0,b:""},
+{t:"14:00",e:"15:00",n:"Acelerando tu código con GH Copilot",y:"Taller",s:"Workshop 3",l:"Developer Land",p:"Christian Medinilla",r:1,b:"AI DEV TOOLS — Taller práctico GitHub Copilot. Hands-on."},
+{t:"14:30",e:"14:55",n:"Las nuevas reglas del dinero",y:"Conferencia",s:"Main Stage",l:"",p:"Angel Pardo",r:0,b:""},
+{t:"14:30",e:"14:55",n:"Del Banco Digital al Banco Autónomo: Banca basada en IA",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Santiago Covelli",r:1,b:"TRADFI+AI — Cofundador Lulo Bank (1er banco digital Colombia). IA en fintech. Reconocido por Banco Mundial y ONU."},
+{t:"14:30",e:"15:00",n:"¿Bata o Corbata?",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Danylo Dex",r:0,b:""},
+{t:"14:30",e:"15:00",n:"Más allá del SEO: Universidades en el ecosistema IA",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Erick Zendejas",r:0,b:""},
+{t:"14:30",e:"15:00",n:"El IMSS como Motor de Salud Global",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"Carla Martínez Castuera",r:0,b:""},
+{t:"14:30",e:"15:00",n:"Inteligencia Artificial para Negocios",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Alan Manzano",r:0,b:""},
+{t:"14:30",e:"15:30",n:"Prototipado ágil con IA",y:"Taller",s:"Zona Comunidades",l:"",p:"Techy Events y Ketherlabs",r:0,b:""},
+{t:"14:30",e:"15:30",n:"Construyendo con Google Antigravity",y:"Taller",s:"Zona Google Cloud",l:"Developer Land",p:"Adriana Moya, Lesly Zerna, Leonardo Del Valle",r:0,b:""},
+{t:"15:00",e:"15:25",n:"Innovación con impacto",y:"Conferencia",s:"Main Stage",l:"Future Land",p:"Dra. Celina Peña Guzmán",r:0,b:""},
+{t:"15:00",e:"15:25",n:"Todo sobre Finanzas y te dio pena preguntar",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Fanycherrys",r:0,b:""},
+{t:"15:00",e:"15:30",n:"Written.app: publicación digital en blockchain",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Brenda Legorreta",r:1,b:"BLOCKCHAIN — Publicación descentralizada. Blockchain más allá de DeFi: contenido/ownership."},
+{t:"15:00",e:"15:30",n:"Eficiencia Cósmica: Lean Manufacturing en el Espacio",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Angeles Nayeli Cruz Gutierrez",r:0,b:""},
+{t:"15:00",e:"15:30",n:"Talento Humano en la Era de la IA",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Mayra Guillén",r:0,b:""},
+{t:"15:00",e:"15:30",n:"¿Te estás comiendo el plástico sin saberlo?",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"Viridiana Lázaro",r:0,b:""},
+{t:"15:00",e:"15:30",n:"El camino a la superinteligencia",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Glenda Michel",r:0,b:""},
+{t:"15:00",e:"16:00",n:"Stay Cool, Turn Fast: Vehicle Dynamics",y:"Taller",s:"Workshop 3",l:"Future Land",p:"Elvis VH y más",r:0,b:""},
+{t:"15:00",e:"16:00",n:"Del Blah blah blah de la IA a la acción",y:"Taller",s:"Workshop 4",l:"Business Land",p:"Rubí Espino",r:0,b:""},
+{t:"15:00",e:"16:00",n:"Entrenando el músculo emprendedor",y:"Taller",s:"Workshop 2",l:"Business Land",p:"Rodrigo Campillo",r:0,b:""},
+{t:"15:00",e:"16:00",n:"Inmunizando tu negocio en la era Post-IA",y:"Taller",s:"Workshop 1",l:"Business Land",p:"Alejandro LC",r:0,b:""},
+{t:"15:30",e:"15:55",n:"Cómo sobrevivir a una IA que intenta sustituirte",y:"Keynote",s:"Main Stage",l:"Future Land",p:"Brais Moure 'MoureDev'",r:1,b:"Ing. software, 3M+ seguidores, Microsoft MVP, GitHub Star, libro #1 Amazon España. El divulgador dev #1 en español."},
+{t:"15:30",e:"15:55",n:"Startup para inversionistas: equipo y storytelling",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Fernanda González",r:0,b:""},
+{t:"15:30",e:"16:00",n:"Del scroll al significado",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Javier Aceves 'Baxter'",r:0,b:""},
+{t:"15:30",e:"16:00",n:"Seller del futuro: IA en Mercado Libre",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Carlos Chiang",r:0,b:""},
+{t:"15:30",e:"16:00",n:"Tus clientes no son solo clientes: hazlos comunidad",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Aurora Carrales",r:0,b:""},
+{t:"15:30",e:"16:00",n:"Tu spec cobra vida con IA",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Catalina N'haux, Javier Solís",r:1,b:"AI DEV — Specs a código con IA. Alternativa técnica si no vas al keynote de MoureDev."},
+{t:"15:30",e:"16:30",n:"Robot pedagógico",y:"Taller",s:"Zona Comunidades",l:"",p:"IEEE UAM Iztapalapa",r:0,b:""},
+{t:"15:30",e:"16:30",n:"Primeros pasos con MCP, ADK y A2A",y:"Taller",s:"Zona Google Cloud",l:"Developer Land",p:"Juan G. Gomez, Camilla Martins, Adriana Moya",r:1,b:"AGENTIC — MCP (Anthropic), ADK (Google), A2A (Agent-to-Agent). Los 3 protocolos del futuro agéntico. TOP PICK."},
+{t:"15:30",e:"16:30",n:"Salud: innovación hacia la longevidad",y:"Panel",s:"Health Stage",l:"Health Land",p:"Javier Govi, Dr. Barojas y más",r:0,b:""},
+{t:"16:00",e:"16:25",n:"Cómo preparar tu futuro ante la IA",y:"Keynote",s:"Main Stage",l:"Future Land",p:"Pablo Gil",r:1,b:"TRADFI+AI — Trader español, 30+ años en mercados reales. Perspectiva seria."},
+{t:"16:00",e:"16:25",n:"El costo de emprender se desplomó",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Ian Lee",r:0,b:""},
+{t:"16:00",e:"16:30",n:"Audiomixtlina: curar el malaudio",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Jorge Delgado",r:0,b:""},
+{t:"16:00",e:"16:30",n:"¿Por qué nadie te contrata en la era de la IA?",y:"Panel",s:"Future Stage",l:"Future Land",p:"Alejandro Frigolet, Vivián Cazadero y más",r:1,b:"CAREER — Panel mercado laboral tech + IA. Perspectivas reales."},
+{t:"16:00",e:"16:30",n:"Negocio líder en la era IA",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Mario Reyes",r:0,b:""},
+{t:"16:00",e:"16:30",n:"El banco que mejora vidas",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Dafne Lozano, Javier Córdoba",r:0,b:""},
+{t:"16:00",e:"17:00",n:"Claves para que tu Negocio Funcione con IA",y:"Taller",s:"Workshop 2",l:"Business Land",p:"Juan Gama",r:0,b:""},
+{t:"16:00",e:"17:00",n:"Escucha lo Invisible / narrativa estratégica",y:"Taller",s:"Workshop 4",l:"Creator Land",p:"JB CREATIVO",r:0,b:""},
+{t:"16:00",e:"17:00",n:"De cero a tu propio servidor con N8N",y:"Taller",s:"Workshop 1",l:"Developer Land",p:"Álvaro Fontela",r:1,b:"AGENTIC — CEO Raiola Networks, 500+ congresos. N8N open source, self-hosted. Alternativa a Zapier/Make."},
+{t:"16:00",e:"17:00",n:"Diseña tu Playable Ad",y:"Taller",s:"Workshop 3",l:"Developer Land",p:"Simon Ceglarek",r:0,b:""},
+{t:"16:30",e:"16:55",n:"¿Le crees todo a la IA? Manual urgente para el pensamiento crítico",y:"Keynote",s:"Main Stage",l:"Future Land",p:"Carmen E. Rodríguez Armenta",r:1,b:"Rectora UDG. Pensamiento crítico vs IA — antídoto contra el humo."},
+{t:"16:30",e:"16:55",n:"Inversiones para Nuevas Generaciones",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Daniel Escudero",r:0,b:""},
+{t:"16:30",e:"17:00",n:"Más allá de la escuela: emprender",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Pamela Elizalde",r:0,b:""},
+{t:"16:30",e:"17:00",n:"Nuevas vacunas con adenovirus de simio",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"Jesús Torres Flores",r:0,b:""},
+{t:"16:30",e:"17:00",n:"Encontrando tu V.O.Z. en espacios técnicos",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Arlet Díaz",r:0,b:""},
+{t:"16:30",e:"17:00",n:"Construyendo el espacio sin salir de la Tierra",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Axel Muriel Salazar",r:0,b:""},
+{t:"16:30",e:"17:00",n:"Contenido Tech: perspectiva de creador y marca",y:"Panel",s:"Creator Stage",l:"Creator Land",p:"Bernardo Stein, Tecnotutostv",r:0,b:""},
+{t:"16:30",e:"18:00",n:"Torneo: juego con IA para la comunidad",y:"Taller",s:"Zona Comunidades",l:"",p:"AWS User Group",r:0,b:""},
+{t:"17:00",e:"17:55",n:"¿Ola o Tsunami?",y:"Keynote",s:"Main Stage",l:"Future Land",p:"Jon Hernández",r:1,b:"Keynote Future Land. Impacto disruptivo de la tecnología."},
+{t:"17:00",e:"17:25",n:"Construir riqueza desde el primer paso",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Juan Pablo Guerra Higuita",r:0,b:""},
+{t:"17:00",e:"17:30",n:"CREATE: diseñar la vida que mereces",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Manuel Cossío",r:0,b:""},
+{t:"17:00",e:"17:30",n:"Business OS: IA Reemplazó a Mi Equipo y Triplicó Resultados",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Daniel Carreón",r:0,b:""},
+{t:"17:00",e:"17:30",n:"Mi Primer Chatbot con IA",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Alejandro Camarillo",r:0,b:""},
+{t:"17:00",e:"17:30",n:"Visión Artificial en la Robótica",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Armando Sáenz",r:0,b:""},
+{t:"17:00",e:"18:00",n:"Fotografía y herramientas: Logitech",y:"Taller",s:"Workshop 4",l:"Creator Land",p:"Oscar Reygo",r:0,b:""},
+{t:"17:00",e:"18:00",n:"Diseña algo que funcione mañana",y:"Taller",s:"Workshop 1",l:"Business Land",p:"Antonio Rendón",r:0,b:""},
+{t:"17:00",e:"18:00",n:"Cinético Rc Experience",y:"Taller",s:"Workshop 2",l:"Future Land",p:"Crishtian Guarneros",r:0,b:""},
+{t:"17:00",e:"18:00",n:"¿Cómo grabo mi primer podcast?",y:"Taller",s:"Workshop 3",l:"Creator Land",p:"MXT LAB",r:0,b:""},
+{t:"17:00",e:"18:00",n:"Prevención y longevidad moderna",y:"Panel",s:"Health Stage",l:"Health Land",p:"Rafael Simón, Gustavo Rodríguez y más",r:0,b:""},
+{t:"17:30",e:"17:55",n:"No compres casa. Compra libertad.",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"El Camino con Fer",r:0,b:""},
+{t:"17:30",e:"18:00",n:"Audio: El activo invisible de una marca",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Ivonne Hernández",r:0,b:""},
+{t:"17:30",e:"18:00",n:"Agentes de IA sin Humo: Cómo Implementarlos Sin Romper Tu Empresa",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Gerardo Pineda",r:1,b:"AGENTIC+INFRA — 18 años. Oracle, Huawei, Telcel, AT&T, Vodafone, Netflix. Ahora en Airbyte (open source). IA/ML, LLMs, infra escalable. ANTI-HUMO."},
+{t:"17:30",e:"18:00",n:"Leer la intención del cliente con IA",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"José Salvador",r:0,b:""},
+{t:"17:30",e:"18:00",n:"De las Soft Skills a las Power Skills",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Dra. Leticia Herrera",r:0,b:""},
+{t:"18:00",e:"18:25",n:"Asombro 101: experiencias memorables",y:"Conferencia",s:"Main Stage",l:"Creator Land",p:"Diego Vargas",r:0,b:""},
+{t:"18:00",e:"18:25",n:"Deeptech: emprendimientos científicos",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Rogelio Marín",r:0,b:""},
+{t:"18:00",e:"18:30",n:"Marketing Brutalista en la Era de la IA",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Edson Noyola",r:0,b:""},
+{t:"18:00",e:"18:30",n:"Entrenar para Triunfar",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"René Navarro",r:0,b:""},
+{t:"18:00",e:"18:30",n:"De idea a negocio real: Más estrategia menos hype",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Itzel Villa",r:0,b:""},
+{t:"18:00",e:"18:30",n:"Crea desde tu raíz",y:"Keynote",s:"Creator Stage",l:"Creator Land",p:"Raquel Deneth",r:0,b:""},
+{t:"18:00",e:"18:30",n:"MarIA Hospitality: primera IA Mexicana Hoteles",y:"Panel",s:"Developer Stage",l:"Developer Land",p:"Sarac Almendarez, Ruben Aguilar",r:0,b:""},
+{t:"18:00",e:"19:00",n:"Construye tu primer asistente IA para WhatsApp",y:"Taller",s:"Workshop 3",l:"Developer Land",p:"Josué Navarro",r:1,b:"AGENTIC — Taller práctico: asistente IA para WhatsApp. Aplicable inmediato."},
+{t:"18:00",e:"19:00",n:"Taller de Identificación Humana",y:"Taller",s:"Zona Comunidades",l:"",p:"La llama forense",r:0,b:""},
+{t:"18:00",e:"19:00",n:"Código que Obedece: Desarrollo escalable con IA",y:"Taller",s:"Workshop 2",l:"Developer Land",p:"Rodrigo Cuellar",r:1,b:"AI DEV — Desarrollo escalable con IA. Alternativa al de WhatsApp si prefieres arquitectura."},
+{t:"18:00",e:"19:00",n:"Transformar reseñas en ventas con IA",y:"Taller",s:"Workshop 1",l:"Business Land",p:"Rodolfo Espitia",r:0,b:""},
+{t:"18:00",e:"19:00",n:"¿Cómo aprende la IA?",y:"Taller",s:"Workshop 4",l:"Future Land",p:"Maciel Vázquez Montoya",r:0,b:""},
+{t:"18:30",e:"18:55",n:"Participa y gana con Capital One",y:"Conferencia",s:"Main Stage",l:"",p:"Julián Rodales",r:0,b:""},
+{t:"18:30",e:"18:55",n:"Sector Energético",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Victor Hugo Juárez Cuevas",r:0,b:""},
+{t:"18:30",e:"19:00",n:"Automatiza la Creatividad con IA",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Antonio Botello",r:0,b:""},
+{t:"18:30",e:"19:00",n:"El ejercicio es medicina",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"José Americano",r:0,b:""},
+{t:"18:30",e:"19:00",n:"Vende con historias: Storytelling que Convierte",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Paulina González-Güitrón",r:0,b:""},
+{t:"18:30",e:"19:00",n:"Software Engineering Excellence at Global Scale",y:"Panel",s:"Developer Stage",l:"Developer Land",p:"Dr. Mauricio García, Daniel Zárate",r:0,b:""},
+{t:"18:30",e:"19:30",n:"Futuro de la Ciencia en Mexico",y:"Panel",s:"Future Stage",l:"Future Land",p:"Roger Marín, Dra. Hernández y más",r:0,b:""},
+{t:"19:00",e:"19:55",n:"La Inspiración Existe",y:"Keynote",s:"Main Stage",l:"Creator Land",p:"Farid Dieck",r:0,b:"YouTuber mexicano. Keynote Creator Land."},
+{t:"19:00",e:"19:25",n:"Liquid Staking: El Lado Inteligente de las Cripto",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Yedid Romero",r:1,b:"DeFi — H.E.R. DAO, cofundadora Guardian DeFi, Vara Network. Hackathones internacionales. Liquid staking puro."},
+{t:"19:00",e:"19:30",n:"Zoombers: videojuego mexicano",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"María Fernanda Torres",r:0,b:""},
+{t:"19:00",e:"19:30",n:"De lo ordinario a lo extraordinario",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Yoel Kluk",r:0,b:""},
+{t:"19:00",e:"19:30",n:"Agentes en producción: automatización con guardrails y métricas",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Jorge Luis Bojorges Leyva",r:1,b:"AGENTIC PRODUCTION — Agentes autónomos en PRODUCCIÓN con guardrails. El tema más avanzado del día."},
+{t:"19:00",e:"19:30",n:"Dispositivos Médicos en el Plan México",y:"Conferencia",s:"Health Stage",l:"Health Land",p:"Lic. Jorge Daniel",r:0,b:""},
+{t:"19:00",e:"19:55",n:"De Todólogo a Estratega",y:"Taller",s:"Workshop 4",l:"Business Land",p:"Alejandro Benítez Mejía",r:0,b:""},
+{t:"19:00",e:"19:55",n:"Hablar un idioma en 30 días",y:"Taller",s:"Workshop 2",l:"Business Land",p:"Marco Bevanati",r:0,b:""},
+{t:"19:00",e:"19:55",n:"Creative Voices: Storytelling in English",y:"Taller",s:"Workshop 3",l:"Creator Land",p:"María Olivia Hernández",r:0,b:""},
+{t:"19:00",e:"19:55",n:"Habilidades tech en negocio digital",y:"Taller",s:"Workshop 1",l:"Business Land",p:"Carlo Pascal",r:0,b:""},
+{t:"19:00",e:"20:00",n:"Impresión 3D y seguridad alimentaria",y:"Taller",s:"Zona Comunidades",l:"",p:"STEAMORRILLAS",r:0,b:""},
+{t:"19:30",e:"19:55",n:"¿Cómo Piensan los Robots de Trading?",y:"Conferencia",s:"Investor Stage",l:"Investor Land",p:"Carlos Daniel Vázquez Rosas",r:1,b:"TRADFI/ALGO — PhD Ingeniería, trader algorítmico, líder IA en Minsait. Robots de trading con ML. El más técnico de finanzas."},
+{t:"19:30",e:"19:55",n:"Viralízate o Desaparece",y:"Conferencia",s:"Creator Stage",l:"Creator Land",p:"Leonardo Gómez Ortiz",r:0,b:""},
+{t:"19:30",e:"19:55",n:"Irremplazable",y:"Conferencia",s:"Future Stage",l:"Future Land",p:"Adrian Duran",r:0,b:""},
+{t:"19:30",e:"19:55",n:"Transformaciones ágiles",y:"Conferencia",s:"Business Stage",l:"Business Land",p:"Oscar Catalán Rodríguez",r:0,b:""},
+{t:"19:30",e:"19:55",n:"¿Cómo poner a trabajar un LLM localmente?",y:"Conferencia",s:"Developer Stage",l:"Developer Land",p:"Víctor Eduardo Moreno Jiménez",r:1,b:"LLMs LOCAL — 3x Microsoft MVP. Netflix, Intel, Microsoft. Arquitecto IA en BRITA AI. Podcast 'Algoritmo Creativo'. Sabe correr LLMs on-prem."},
+{t:"20:00",e:"20:25",n:"IA Agéntica: Más Allá del Prompt — Agentes Autónomos",y:"Conferencia",s:"Main Stage",l:"Developer Land",p:"Jorge Paz",r:1,b:"AGENTIC — Especialista Data+IA en IBM, 17+ años. Ing. Cibernética, Master IT Specialist. IA Agéntica en Main Stage. Cierre técnico."},
+{t:"20:00",e:"21:00",n:"Signos Vitales - Tu primera línea de defensa",y:"Taller",s:"Zona Comunidades",l:"",p:"Central de Enfermería",r:0,b:""},
+{t:"20:30",e:"20:55",n:"Motion is a mindset",y:"Conferencia",s:"Main Stage",l:"Business Land",p:"Gabriel Rivera",r:0,b:""},
+{t:"20:30",e:"22:30",n:"Gran torneo de combate medieval",y:"Taller",s:"Business Stage",l:"",p:"Medieval Commerce",r:0,b:""},
+{t:"21:00",e:"21:55",n:"Entrevista con Marcus Dantus",y:"Keynote",s:"Main Stage",l:"Business Land",p:"Marcus Dantus",r:1,b:"Shark Tank México, fundador Startup México. Referente emprendedor."},
+{t:"22:00",e:"22:25",n:"Robots Humanoides: oportunidad en IA para México",y:"Panel",s:"Main Stage",l:"Future Land",p:"Aldo Luevano, RoomieBot2",r:1,b:"ROBOTICS — Panel de cierre con RoomieBot2 (robot mexicano). Cutting-edge."},
+];
+
+let F={},cf='all',cv='all',sq='';
+try{F=JSON.parse(localStorage.getItem('tlF')||'{}')}catch(e){F={}}
+function sf(){try{localStorage.setItem('tlF',JSON.stringify(F))}catch(e){}}
+
+function isLive(s){
+  const now=new Date(),h=now.getHours(),m=now.getMinutes(),cm=h*60+m;
+  const[sh,sm]=s.t.split(':').map(Number),[eh,em]=s.e.split(':').map(Number);
+  return cm>=sh*60+sm && cm<eh*60+em;
+}
+
+function mf(s){
+  if(cf==='all')return true;
+  if(cf==='rec')return s.r;
+  return s.s.includes(cf)||s.l.includes(cf);
+}
+function ms(s){
+  if(!sq)return true;
+  const q=sq.toLowerCase();
+  return s.n.toLowerCase().includes(q)||s.p.toLowerCase().includes(q)||s.s.toLowerCase().includes(q)||s.l.toLowerCase().includes(q)||s.y.toLowerCase().includes(q);
+}
+
+function render(){
+  const c=document.getElementById('ag');
+  let h='',lt='',vc=0;
+  S.forEach((s,i)=>{
+    if(cv==='fav'&&!F[i])return;
+    if(cv==='rec'&&!s.r)return;
+    if(!mf(s)||!ms(s))return;
+    vc++;
+    if(s.t!==lt){lt=s.t;h+=`<div class="tl">${s.t}</div>`}
+    const live=isLive(s),isR=s.r,isK=s.y==='Keynote',isF=F[i];
+    let cls='c';if(isK)cls+=' kn';else if(isR)cls+=' rec';
+    h+=`<div class="${cls}">`;
+    if(isR&&!isK)h+=`<div class="tag">RECOMENDADA</div>`;
+    if(isK)h+=`<div class="tag">KEYNOTE</div>`;
+    h+=`<div class="c-top"><span class="c-type${isK?' kn':''}">${s.y}</span>`;
+    h+=`<div style="display:flex;align-items:center;gap:8px">`;
+    if(s.l)h+=`<span class="c-land">${s.l}</span>`;
+    h+=`<div class="fv${isF?' on':''}" data-i="${i}" onclick="tf(${i})">&#10003;</div>`;
+    h+=`</div></div>`;
+    h+=`<div class="c-title">${s.n}</div>`;
+    h+=`<div class="c-meta"><span class="dot${live?' live':''}"></span>${s.t}–${s.e} · ${s.s}</div>`;
+    if(s.p)h+=`<div class="c-speaker">${s.p}</div>`;
+    if(s.b&&(isR||isK))h+=`<div class="c-bio">${s.b}</div>`;
+    h+=`</div>`;
+  });
+  if(!vc)h='<div class="empty">Sin resultados. Prueba otro filtro.</div>';
+  c.innerHTML=h;
+}
+
+function tf(i){if(F[i])delete F[i];else F[i]=true;sf();render()}
+
+document.getElementById('si').addEventListener('input',e=>{sq=e.target.value;render()});
+
+document.getElementById('flt').addEventListener('click',e=>{
+  const b=e.target.closest('.fb');if(!b)return;
+  document.querySelectorAll('.fb').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');cf=b.dataset.f;render();
+});
+
+document.querySelector('.bnav').addEventListener('click',e=>{
+  const b=e.target.closest('.nb');if(!b)return;
+  if(b.id==='nowBtn'){
+    // If on map view, switch back to agenda first
+    if(document.getElementById('mapView').classList.contains('show')){
+      document.getElementById('mapView').classList.remove('show');
+      document.getElementById('ag').style.display='';
+      document.querySelector('.hdr').style.display='';
+      cv='all';
+      document.querySelectorAll('.nb').forEach(x=>x.classList.remove('on'));
+      document.querySelector('.nb[data-v="all"]').classList.add('on');
+      render();
+    }
+    const now=new Date(),cm=now.getHours()*60+now.getMinutes();
+    const tls=document.querySelectorAll('.tl');let tgt=null;
+    for(const t of tls){
+      const[h,m]=t.textContent.trim().split(':').map(Number);
+      const tm=h*60+m;
+      if(tm<=cm)tgt=t;
+      else if(!tgt&&tm>cm){tgt=t;break}
+    }
+    if(!tgt&&tls.length)tgt=tls[tls.length-1];
+    if(tgt)tgt.scrollIntoView({behavior:'smooth',block:'start'});
+    return;
+  }
+  document.querySelectorAll('.nb').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  const v=b.dataset.v;
+  if(v==='map'){
+    document.getElementById('ag').style.display='none';
+    document.querySelector('.hdr').style.display='none';
+    document.getElementById('mapView').classList.add('show');
+    window.scrollTo(0,0);
+  } else {
+    document.getElementById('mapView').classList.remove('show');
+    document.getElementById('ag').style.display='';
+    document.querySelector('.hdr').style.display='';
+    cv=v;render();
+  }
+});
+
+// THEME: detect preference, persist choice
+function getTheme(){
+  const saved=localStorage.getItem('tlTheme');
+  if(saved)return saved;
+  return window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';
+}
+function applyTheme(t){document.documentElement.setAttribute('data-theme',t);localStorage.setItem('tlTheme',t)}
+function toggleTheme(){const t=document.documentElement.getAttribute('data-theme')==='dark'?'light':'dark';applyTheme(t)}
+applyTheme(getTheme());
+// Listen for OS theme changes
+if(window.matchMedia){window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',e=>{if(!localStorage.getItem('tlTheme'))applyTheme(e.matches?'dark':'light')})}
+
+// Auto-refresh live dots every 30s
+setInterval(()=>{
+  document.querySelectorAll('.dot').forEach(d=>{
+    const card=d.closest('.c');if(!card)return;
+    const meta=card.querySelector('.c-meta');if(!meta)return;
+    const txt=meta.textContent;
+    const m=txt.match(/(\d{2}):(\d{2})\u2013(\d{2}):(\d{2})/);
+    if(!m)return;
+    const now=new Date(),cm=now.getHours()*60+now.getMinutes();
+    const st=parseInt(m[1])*60+parseInt(m[2]),en=parseInt(m[3])*60+parseInt(m[4]);
+    if(cm>=st&&cm<en)d.classList.add('live');else d.classList.remove('live');
+  });
+},30000);
+
+// SHARE: uses Web Share API (triggers AirDrop/Bluetooth sheet on iOS/Android)
+function shareFile(){
+  const blob=new Blob([document.documentElement.outerHTML],{type:'text/html'});
+  const file=new File([blob],'talent-land-mie8.html',{type:'text/html'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    navigator.share({files:[file],title:'Talent Land 2026 — Mié 8 Agenda',text:'Agenda offline Talent Land 2026 by @pondinora'}).catch(()=>{});
+  } else if(navigator.share){
+    navigator.share({title:'Talent Land 2026 — Mié 8 Agenda',text:'Agenda offline Talent Land 2026 by @pondinora'}).catch(()=>{});
+  } else {
+    alert('Abre el menú de tu navegador para compartir este archivo por AirDrop o Bluetooth.');
+  }
+}
+// Hide share button if no share API
+if(!navigator.share)document.getElementById('shareBtn').style.display='none';
+
+render();
+</script>
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js')</script>
+</body>
+</html>
