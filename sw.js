@@ -1,5 +1,5 @@
-const CACHE = 'tl-agenda-v1';
-const ASSETS = ['./', './index.html'];
+const CACHE = 'tl-agenda-v2';
+const ASSETS = ['./', './index.html', './jue9.html'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
